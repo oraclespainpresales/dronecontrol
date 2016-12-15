@@ -233,7 +233,7 @@ router.post(URI, function(req, res) {
       res.status(500).send({ message: err });
     } else {
       // "command" object contains all data. Send it over WS
-      //console.log("%j", command);
+      console.log("%j", command);
       if ( ws) {
         ws.send(JSON.stringify(command));
         response = "Command sent successfully";
