@@ -188,12 +188,16 @@ wss.on('connection', function(_ws) {
       }
     });
 **/
-    // Send drone status change to the event server
-    var data = {
-      demozone: currentDemozone,
-      status: status
-    };
-    eventClient.post(DRONEEVENTURI, data, function(err, _req, _res, obj) {
+    // Send drone status change to the event server. Payload structure follows IoTCS one to ease things in the event server
+    var jsonPayload = [{
+      payload: {
+        data: {
+          data_demozone: currentDemozone,
+          status: status
+        }
+      }
+    }];
+    eventClient.post(DRONEEVENTURI, jsonPayload, function(err, _req, _res, obj) {
       if (err) {
         console.log(err);
       } else {
