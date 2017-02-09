@@ -11,13 +11,18 @@ var express = require('express')
 ;
 
 // DBCS APEX stuff
-const DBZONEHOST = "https://oc-129-152-129-94.compute.oraclecloud.com";
+//const DBZONEHOST = "https://oc-129-152-129-94.compute.oraclecloud.com";
+const DBZONEHOST = "https://129.152.129.94";
 var   DBZONEURI = "/apex/pdb1/anki/zone/steps/{demozone}/{id}";
 var   DBDOCSSETUP = "/apex/pdb1/anki/docs/setup/{demozone}";
 // SOACS stuff
-const SOAHOST = "http://oc-129-152-131-150.compute.oraclecloud.com:8001";
+//const SOAHOST = "http://oc-129-152-131-150.compute.oraclecloud.com:8001";
+const SOAHOST = "http://129.152.131.150:8001";
 const DRONELANDURI = "/soa-infra/resources/default/DroneHelper/DispatchDroneService/drone/land";
 var   DRONESTATUSURI = "/BAMHelper/UpdateDroneStatusService/anki/event/drone/{demozone}/{status}";
+// Event server
+const EVENSERVERHOST = "http://129.152.131.103:10001"
+const DRONEEVENTURI = "/event/drone"
 // Local stuff
 const URI = '/go/:demozone/:corrid/:folder/:zone';
 const pingURI = "/ping";
@@ -48,6 +53,15 @@ var app    = express()
   , soaClient = restify.createJsonClient({
     url: SOAHOST,
     rejectUnauthorized: false
+  })
+  , eventClient = restify.createJsonClient({
+    url: EVENSERVERHOST,
+    connectTimeout: 1000,
+    requestTimeout: 1000,
+    retry: false,
+    headers: {
+      "content-type": "application/json"
+    }
   })
 ;
 
@@ -164,12 +178,26 @@ wss.on('connection', function(_ws) {
     } else {
       // TODO
     }
-    // Update drone status
+/**
+    // Update drone status in BAM
     soaClient.post(DRONESTATUSURI.replace('{demozone}', jsonData.demozone).replace('{status}', encodeURI(status)), function(err, _req, _res, obj) {
       if (err) {
         console.log(err);
       } else {
         console.log("Drone status updated successfully");
+      }
+    });
+**/
+    // Send drone status change to the event server
+    var data = {
+      demozone: currentDemozone,
+      status: status
+    };
+    eventClient.post(DRONEEVENTURI, data, function(err, _req, _res, obj) {
+      if (err) {
+        console.log(err);
+      } else {
+        console.log("Status sent to event server successfully");
       }
     });
 
@@ -233,7 +261,7 @@ router.post(URI, function(req, res) {
       res.status(500).send({ message: err });
     } else {
       // "command" object contains all data. Send it over WS
-      console.log("%j", command);
+      // console.log("%j", command);
       if ( ws) {
         ws.send(JSON.stringify(command));
         response = "Command sent successfully";
