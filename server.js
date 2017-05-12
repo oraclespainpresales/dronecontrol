@@ -24,7 +24,7 @@ var   DRONESTATUSURI = "/BAMHelper/UpdateDroneStatusService/anki/event/drone/{de
 const EVENSERVERHOST = "http://129.152.131.103:10001"
 const DRONEEVENTURI = "/event/drone"
 // Local stuff
-const URI = '/go/:demozone/:corrid/:folder/:zone';
+const URI = '/go/:demozone/:corrid/:folder/:zone/:source?';
 const pingURI = "/ping";
 
 // Other constants
@@ -65,6 +65,9 @@ var app    = express()
   })
 ;
 
+// Workaround for BOT handling until we can patch the Drone App
+var sourceMap = [];
+
 // ************************************************************************
 // Main code STARTS HERE !!
 // ************************************************************************
@@ -94,6 +97,7 @@ app.use(bodyParser.json());
 const restURI = '/drone';
 var ws = undefined;
 var currentCorrId = undefined;
+var source = undefined;
 
 // WEBSOCKET stuff - BEGIN
 
@@ -162,7 +166,20 @@ wss.on('connection', function(_ws) {
       status = "DOWNLOADING";
     } else if ( jsonData.result.toLowerCase() === FINISH) {
       status = "LANDED";
+
+      // Workaround for BOT handling until we can patch the Drone App
+      var s;
+      sourceRecord = sourceMap.find(o => o.corrId === jsonData.id);
+      if (sourceRecord) {
+        s = sourceRecord.source;
+        var i = sourceMap.findIndex(o => o.corrId === jsonData.id);
+        sourceMap.splice(i,1);
+      } else {
+        s = 'PCS';
+      }
+
       var data = {
+        SOURCE: s,
         PROCESSID : jsonData.id,
         DEMOZONE : currentDemozone,
         result : "OK"
@@ -212,10 +229,18 @@ wss.on('connection', function(_ws) {
 // REST stuff - BEGIN
 router.post(URI, function(req, res) {
   console.log("POST request: %j", req.params);
+  source = "PCS"; // By default, if source is not comming is because request should have come from PCS
   currentDemozone = req.params.demozone;
   DBZONEURI   = DBZONEURI.replace('{demozone}', currentDemozone);
   DBDOCSSETUP = DBDOCSSETUP.replace('{demozone}', currentDemozone);
+  if (req.params.source) {
+    source = req.params.source;
+  }
   var corrId = req.params.corrid;
+
+  // Workaround for BOT handling until we can patch the Drone App
+  sourceMap.push({corrId: corrId, source: source});
+
   currentCorrId = corrId;
   var folderId = req.params.folder;
   var zone = req.params.zone;
@@ -223,6 +248,7 @@ router.post(URI, function(req, res) {
   var self = this;
   var command = {};
   var response = "";
+  command.source = source;
   command.corrId = corrId;
   command.demozone = currentDemozone;
 
