@@ -169,7 +169,7 @@ wss.on('connection', function(_ws) {
 
       // Workaround for BOT handling until we can patch the Drone App
       var s;
-      sourceRecord = sourceMap.find(o => o.corrId === jsonData.id);
+      var sourceRecord = sourceMap.find(o => o.corrId === jsonData.id);
       if (sourceRecord) {
         s = sourceRecord.source;
         var i = sourceMap.findIndex(o => o.corrId === jsonData.id);
