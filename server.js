@@ -12,16 +12,19 @@ var express = require('express')
 
 // DBCS APEX stuff
 //const DBZONEHOST = "https://oc-129-152-129-94.compute.oraclecloud.com";
-const DBZONEHOST = "https://129.152.129.94";
+//const DBZONEHOST = "https://129.152.129.94";
+const DBZONEHOST = "https://dbhost";
 var   DBZONEURI = "/apex/pdb1/anki/zone/steps/{demozone}/{id}";
 var   DBDOCSSETUP = "/apex/pdb1/anki/docs/setup/{demozone}";
 // SOACS stuff
 //const SOAHOST = "http://oc-129-152-131-150.compute.oraclecloud.com:8001";
-const SOAHOST = "http://129.152.131.150:8001";
+//const SOAHOST = "http://129.152.131.150:8001";
+const SOAHOST = "http://soahost:8001";
 const DRONELANDURI = "/soa-infra/resources/default/DroneHelper/DispatchDroneService/drone/land";
 var   DRONESTATUSURI = "/BAMHelper/UpdateDroneStatusService/anki/event/drone/{demozone}/{status}";
 // Event server
-const EVENSERVERHOST = "http://129.152.131.103:10001"
+//const EVENSERVERHOST = "http://129.152.131.103:10001"
+const EVENSERVERHOST = "http://helperhost:10001"
 const DRONEEVENTURI = "/event/drone"
 // Local stuff
 const URI = '/go/:demozone/:corrid/:folder/:zone/:source?';
