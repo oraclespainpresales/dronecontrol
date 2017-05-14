@@ -1,7 +1,8 @@
 'use strict';
 
 // Module imports
-var express = require('express')
+var log = require('npmlog-ts')
+  , express = require('express')
   , WebSocketServer = require('ws').Server
   , restify = require('restify')
   , http = require('http')
@@ -10,20 +11,19 @@ var express = require('express')
   , async = require('async')
 ;
 
+// Log stuff
+log.level     = 'verbose';
+log.timestamp = true;
+
 // DBCS APEX stuff
-//const DBZONEHOST = "https://oc-129-152-129-94.compute.oraclecloud.com";
-//const DBZONEHOST = "https://129.152.129.94";
 const DBZONEHOST = "https://apex.digitalpracticespain.com";
 var   DBZONEURI = "/apex/pdb1/anki/zone/steps/{demozone}/{id}";
 var   DBDOCSSETUP = "/apex/pdb1/anki/docs/setup/{demozone}";
 // SOACS stuff
-//const SOAHOST = "http://oc-129-152-131-150.compute.oraclecloud.com:8001";
-//const SOAHOST = "http://129.152.131.150:8001";
 const SOAHOST = "http://soa.digitalpracticespain.com:8001";
 const DRONELANDURI = "/soa-infra/resources/default/DroneHelper/DispatchDroneService/drone/land";
 var   DRONESTATUSURI = "/BAMHelper/UpdateDroneStatusService/anki/event/drone/{demozone}/{status}";
 // Event server
-//const EVENSERVERHOST = "http://129.152.131.103:10001"
 const EVENSERVERHOST = "http://proxy.digitalpracticespain.com:10001"
 const DRONEEVENTURI = "/event/drone"
 // Local stuff
@@ -78,13 +78,13 @@ var sourceMap = [];
 // Main handlers registration - BEGIN
 // Main error handler
 process.on('uncaughtException', function (err) {
-  console.log("Uncaught Exception: " + err);
-  console.log("Uncaught Exception: " + err.stack);
+  log.error("","Uncaught Exception: " + err);
+  log.error("","Uncaught Exception: " + err.stack);
 });
 // Detect CTRL-C
 process.on('SIGINT', function() {
-  console.log("Caught interrupt signal");
-  console.log("Exiting gracefully");
+  log.error("","Caught interrupt signal");
+  log.error("","Exiting gracefully");
   process.exit(2);
 });
 // Main handlers registration - END
@@ -114,18 +114,18 @@ var wss = new WebSocketServer({
 
 wss.on('connection', function(_ws) {
 
-  console.log("WS session connected");
+  log.info("","WS session connected");
   ws = _ws;
 
   _ws.on('close', function() {
-    console.log("WS session disconnected");
+    log.info("","WS session disconnected");
     ws = undefined;
 //    currentCorrId = undefined;
   });
 
   _ws.on('message', function(data, flags) {
     var jsonData = JSON.parse(data);
-    console.log("Incoming data received: %j", jsonData);
+    log.info("","Incoming data received: %j", jsonData);
 
     if ( jsonData.result.toLowerCase() === PONG) {
       if ( !waitingPing) {
@@ -138,19 +138,19 @@ wss.on('connection', function(_ws) {
       return;
     }
     if ( !jsonData.id) {
-        console.log("Invalid message received: " + data);
+        log.error("","Invalid message received: " + data);
         return;
     }
     if ( !jsonData.demozone || jsonData.demozone === "") {
-        console.log("No demozone received!!: " + data);
+        log.error("","No demozone received!!: " + data);
         return;
     }
     if ( !currentCorrId) {
-      console.log("No correlation id stored now!. Ignoring command.");
+      log.error("","No correlation id stored now!. Ignoring command.");
       return;
     }
     if ( currentCorrId !== jsonData.id) {
-      console.log("Current correlation id (%s) doesn't match incoming id: %s", currentCorrId, jsonData.id);
+      log.error("","Current correlation id (%s) doesn't match incoming id: %s", currentCorrId, jsonData.id);
       return;
     }
     // Up to this point, we receive a valid "finish" or "changedStatus" message that we were waiting.
@@ -187,12 +187,12 @@ wss.on('connection', function(_ws) {
         DEMOZONE : currentDemozone,
         result : "OK"
       };
-      console.log("Callback to be invoked with: %j", data);
+      log.info("","Callback to be invoked with: %j", data);
       soaClient.post(DRONELANDURI, data, function(err, _req, _res, obj) {
         if (err) {
           console.log(err);
         } else {
-          console.log("Callback invoked successfully");
+          log.info("","Callback invoked successfully");
         }
       });
     } else {
@@ -204,7 +204,7 @@ wss.on('connection', function(_ws) {
       if (err) {
         console.log(err);
       } else {
-        console.log("Drone status updated successfully");
+        log.info("","Drone status updated successfully");
       }
     });
 **/
@@ -221,7 +221,7 @@ wss.on('connection', function(_ws) {
       if (err) {
         console.log(err);
       } else {
-        console.log("Status sent to event server successfully");
+        log.info("","Status sent to event server successfully");
       }
     });
 
@@ -231,7 +231,7 @@ wss.on('connection', function(_ws) {
 
 // REST stuff - BEGIN
 router.post(URI, function(req, res) {
-  console.log("POST request: %j", req.params);
+  log.info("","POST request: %j", req.params);
   source = "PCS"; // By default, if source is not comming is because request should have come from PCS
   currentDemozone = req.params.demozone;
   DBZONEURI   = DBZONEURI.replace('{demozone}', currentDemozone);
@@ -294,14 +294,14 @@ router.post(URI, function(req, res) {
       res.status(500).send({ message: err });
     } else {
       // "command" object contains all data. Send it over WS
-      // console.log("%j", command);
+      // log.info("","%j", command);
       if ( ws) {
         ws.send(JSON.stringify(command));
         response = "Command sent successfully";
         res.send({ message: response });
       } else {
         // WebSocket session not opened when received the command!!
-        console.log("Request received but no WS session opened!");
+        log.error("","Request received but no WS session opened!");
         response = "WebSocket session not opened!";
         res.status(500).send({ message: response });
       }
@@ -310,9 +310,9 @@ router.post(URI, function(req, res) {
 });
 
 router.get(pingURI, function(req, res) {
-  console.log("PING request received...");
+  log.info("","PING request received...");
   if (!ws) {
-    console.log("NO WS session opened");
+    log.error("","NO WS session opened");
     res.status(503).send({ message: "WS session not opened"});
     return;
   } else {
@@ -329,13 +329,13 @@ router.get(pingURI, function(req, res) {
 });
 
 router.get('/', function(req, res) {
-  console.log("REST request");
+  log.info("","REST request");
   res.send({ message: "Usage: POST /drone" + URI });
 });
 app.use(restURI, router);
 // REST stuff - END
 
 server.listen(PORT, function() {
-  console.log("REST server running on http://localhost:" + PORT + restURI + URI);
-  console.log("WS server running on http://localhost:" + PORT + wsURI);
+  log.info("","REST server running on http://localhost:" + PORT + restURI + URI);
+  log.info("","WS server running on http://localhost:" + PORT + wsURI);
 });
