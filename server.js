@@ -17,15 +17,15 @@ log.timestamp = true;
 
 /**/
 // DBCS APEX stuff
-const DBZONEHOST = "https://new.apex.digitalpracticespain.com";
+const DBZONEHOST = "https://" + process.env.DBSERVER;
 var   DBZONEURI = "/ords/pdb1/anki/zone/steps/{demozone}/{id}";
 var   DBDOCSSETUP = "/ords/pdb1/anki/docs/setup/{demozone}";
 // SOACS stuff
-const SOAHOST = "http://new.soa.digitalpracticespain.com:8001";
+const SOAHOST = "http://" + process.env.SOASERVER + ":8001";
 const DRONELANDURI = "/soa-infra/resources/default/DroneHelper/DispatchDroneService/drone/land";
 var   DRONESTATUSURI = "/BAMHelper/UpdateDroneStatusService/anki/event/drone/{demozone}/{status}";
 // Event server
-const EVENSERVERHOST = "http://new.proxy.digitalpracticespain.com:10001"
+const EVENSERVERHOST = "http://" + process.env.EVENTSERVER + ":10001"
 const DRONEEVENTURI = "/event/drone"
 /**/
 
