@@ -29,20 +29,6 @@ const EVENSERVERHOST = "http://" + process.env.EVENTSERVER + ":10001"
 const DRONEEVENTURI = "/event/drone"
 /**/
 
-/**
-// DBCS APEX stuff
-const DBZONEHOST = "https://new.apex.digitalpracticespain.com";
-var   DBZONEURI = "/ords/pdb1/anki/zone/steps/{demozone}/{id}";
-var   DBDOCSSETUP = "/ords/pdb1/anki/docs/setup/{demozone}";
-// SOACS stuff
-const SOAHOST = "http://new.soa.digitalpracticespain.com:8001";
-const DRONELANDURI = "/soa-infra/resources/default/DroneHelper/DispatchDroneService/drone/land";
-var   DRONESTATUSURI = "/BAMHelper/UpdateDroneStatusService/anki/event/drone/{demozone}/{status}";
-// Event server
-const EVENSERVERHOST = "http://new.proxy.digitalpracticespain.com:10001"
-const DRONEEVENTURI = "/event/drone"
-**/
-
 // Local stuff
 const URI = '/go/:demozone/:corrid/:folder/:zone/:source?';
 const pingURI = "/ping";
