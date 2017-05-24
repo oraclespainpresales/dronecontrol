@@ -15,11 +15,25 @@ var log = require('npmlog-ts')
 log.level     = 'verbose';
 log.timestamp = true;
 
-/**/
+/**
 // DBCS APEX stuff
 const DBZONEHOST = "https://" + process.env.DBSERVER;
 var   DBZONEURI = "/ords/pdb1/anki/zone/steps/{demozone}/{id}";
 var   DBDOCSSETUP = "/ords/pdb1/anki/docs/setup/{demozone}";
+// SOACS stuff
+const SOAHOST = "http://" + process.env.SOASERVER + ":8001";
+const DRONELANDURI = "/soa-infra/resources/default/DroneHelper/DispatchDroneService/drone/land";
+var   DRONESTATUSURI = "/BAMHelper/UpdateDroneStatusService/anki/event/drone/{demozone}/{status}";
+// Event server
+const EVENSERVERHOST = "http://" + process.env.EVENTSERVER + ":10001"
+const DRONEEVENTURI = "/event/drone"
+**/
+
+/**/
+// DBCS APEX stuff
+const DBZONEHOST = "https://" + process.env.DBSERVER;
+var   DBZONEURI = "/apex/pdb1/anki/zone/steps/{demozone}/{id}";
+var   DBDOCSSETUP = "/apex/pdb1/anki/docs/setup/{demozone}";
 // SOACS stuff
 const SOAHOST = "http://" + process.env.SOASERVER + ":8001";
 const DRONELANDURI = "/soa-infra/resources/default/DroneHelper/DispatchDroneService/drone/land";
