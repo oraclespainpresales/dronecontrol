@@ -16,7 +16,7 @@ log.level     = 'verbose';
 log.timestamp = true;
 
 log.info("","Current DBSERVER:    " + process.env.DBSERVER);
-log.info("","Current SOASERVER:   " + process.env.EVENTSERVER);
+log.info("","Current SOASERVER:   " + process.env.SOASERVER);
 log.info("","Current EVENTSERVER: " + process.env.EVENTSERVER);
 
 /**/
