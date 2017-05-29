@@ -15,7 +15,9 @@ var log = require('npmlog-ts')
 log.level     = 'verbose';
 log.timestamp = true;
 
-console.log("DBSERVER: " + process.env.DBSERVER);
+log.info("","Current DBSERVER:    " + process.env.DBSERVER);
+log.info("","Current SOASERVER:   " + process.env.EVENTSERVER);
+log.info("","Current EVENTSERVER: " + process.env.EVENTSERVER);
 
 /**/
 // DBCS APEX stuff
