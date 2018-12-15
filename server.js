@@ -25,7 +25,7 @@ const DBZONEHOST = "https://" + process.env.DBSERVER;
 var   DBZONEURI = "/ords/pdb1/anki/zone/steps/{demozone}/{id}";
 var   DBDOCSSETUP = "/ords/pdb1/anki/docs/setup/{demozone}";
 // SOACS stuff
-const SOAHOST = "http://" + process.env.SOASERVER + ":8001";
+const SOAHOST = "http://" + process.env.SOASERVER;
 const DRONELANDURI = "/soa-infra/resources/default/DroneHelper/DispatchDroneService/drone/land";
 var   DRONESTATUSURI = "/BAMHelper/UpdateDroneStatusService/anki/event/drone/{demozone}/{status}";
 // Event server
